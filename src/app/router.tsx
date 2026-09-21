@@ -2,28 +2,28 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Layout } from '@core/components/Layout';
 import { AdminLoginPage, RequireRole } from '@features/auth/public';
 import {
-  AdminNewsPage,
-  NewsDetailsPage,
-  NewsListPage,
+	AdminNewsPage,
+	NewsDetailsPage,
+	NewsListPage,
 } from '@features/news/public';
 import { HomePage } from '@features/home/public';
 import { AboutPage } from '@features/about/public';
 import { AgendaPage } from '@features/agenda/public';
 
 export const router = createBrowserRouter([
-  {
-    element: <Layout />,
-    children: [
-      { path: '/', element: <HomePage /> },
-      { path: '/about', element: <AboutPage /> },
-      { path: '/agenda', element: <AgendaPage /> },
-      { path: '/news', element: <NewsListPage /> },
-      { path: '/news/:slug', element: <NewsDetailsPage /> },
-      { path: '/admin/login', element: <AdminLoginPage /> },
-      {
-        element: <RequireRole role="admin" />,
-        children: [{ path: '/admin/news', element: <AdminNewsPage /> }],
-      },
-    ],
-  },
+	{
+		element: <Layout />,
+		children: [
+			{ path: '/', element: <HomePage /> },
+			{ path: '/about', element: <AboutPage /> },
+			{ path: '/agenda', element: <AgendaPage /> },
+			{ path: '/news', element: <NewsListPage /> },
+			{ path: '/news/:slug', element: <NewsDetailsPage /> },
+			{ path: '/admin/login', element: <AdminLoginPage /> },
+			{
+				element: <RequireRole role='admin' />,
+				children: [{ path: '/admin/news', element: <AdminNewsPage /> }],
+			},
+		],
+	},
 ]);

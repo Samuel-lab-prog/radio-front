@@ -7,17 +7,17 @@ import { defineConfig } from 'eslint/config';
 import prettier from 'eslint-config-prettier/flat';
 
 export default defineConfig([
-  { ignores: ['dist/**', 'node_modules/**'] },
-  {
-    files: ['src/**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-      prettier,
-    ],
-    languageOptions: { globals: globals.browser },
-    rules: { '@typescript-eslint/no-unused-vars': 'error' },
-  },
+	{ ignores: ['dist/**', 'node_modules/**'] },
+	{
+		files: ['src/**/*.{ts,tsx}'],
+		extends: [
+			js.configs.recommended,
+			tseslint.configs.recommended,
+			reactHooks.configs['recommended-latest'],
+			reactRefresh.configs.vite,
+			prettier,
+		],
+		languageOptions: { globals: globals.browser },
+		rules: { '@typescript-eslint/no-unused-vars': 'error' },
+	},
 ]);
