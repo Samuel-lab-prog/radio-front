@@ -101,7 +101,7 @@ function RadioPlayerControls() {
 			</header>
 			<Outlet />
 			<aside
-				className='fixed bottom-3 left-1/2 z-30 flex min-h-[66px] w-[calc(100%-1rem)] max-w-[650px] -translate-x-1/2 items-center gap-2 rounded-2xl bg-[#132d4b] px-3 py-2.5 text-white shadow-[0_16px_40px_rgb(7_17_32_/_25%)] sm:bottom-4 sm:w-[calc(100%-2rem)] sm:gap-4 sm:px-4'
+				className='fixed bottom-4 right-4 z-30 flex min-h-[66px] w-[calc(100%-2rem)] max-w-[430px] items-center gap-2 rounded-2xl bg-[#132d4b]/95 px-3 py-2.5 text-white shadow-[0_16px_40px_rgb(7_17_32_/_25%)] backdrop-blur-sm sm:gap-4 sm:px-4'
 				id='live'
 			>
 				<div className='grid min-w-0 flex-1 gap-1'>
