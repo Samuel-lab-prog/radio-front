@@ -40,7 +40,20 @@ export type NewsCoverUpload = {
 export function getNewsCoverUrl(key: string | null | undefined) {
 	if (!key) return undefined;
 	const baseUrl = import.meta.env.VITE_MEDIA_BASE_URL;
-	return baseUrl ? `${baseUrl.replace(/\/$/, '')}/${key}` : undefined;
+	if (!baseUrl) return undefined;
+	const normalizedBaseUrl = baseUrl.replace(/\/+$/, '');
+	try {
+		const parsed = new URL(normalizedBaseUrl);
+		const bucket = import.meta.env.VITE_MEDIA_BUCKET_NAME || 'radio-gaivota';
+		const pathParts = parsed.pathname.split('/').filter(Boolean);
+		const prefix =
+			parsed.hostname.endsWith('.r2.dev') && !pathParts.includes(bucket)
+				? `/${bucket}`
+				: '';
+		return `${normalizedBaseUrl}${prefix}/${key}`;
+	} catch {
+		return `${normalizedBaseUrl}/${key}`;
+	}
 }
 
 export const newsApi = {
