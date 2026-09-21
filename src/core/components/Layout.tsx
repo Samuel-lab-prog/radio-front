@@ -40,6 +40,15 @@ function RadioPlayerControls() {
               className={({ isActive }) =>
                 `inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
               }
+              end
+              to="/"
+            >
+              Início
+            </NavLink>
+            <NavLink
+              className={({ isActive }) =>
+                `inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
+              }
               to="/news"
             >
               Notícias

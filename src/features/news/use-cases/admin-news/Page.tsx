@@ -136,7 +136,7 @@ export function AdminNewsPage() {
       content: news.content,
       tags,
     });
-    setTagsText(tags.join(', '));
+    setTagsText('');
     setSaveStatus(news.status);
     setMessage(undefined);
     setPanelMode('edit');
@@ -154,20 +154,42 @@ export function AdminNewsPage() {
     setPanelMode('delete');
   }
 
+  function addTags(value: string) {
+    const newTags = value
+      .split(/[\n,]/)
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+    if (!newTags.length) return;
+
+    setDraft((current) => {
+      const tags = [...current.tags];
+      for (const tag of newTags) {
+        if (tags.length >= 10) break;
+        if (
+          !tags.some((existing) => existing.toLowerCase() === tag.toLowerCase())
+        ) {
+          tags.push(tag);
+        }
+      }
+      return { ...current, tags };
+    });
+    setTagsText('');
+  }
+
+  function removeTag(tagToRemove: string) {
+    setDraft((current) => ({
+      ...current,
+      tags: current.tags.filter((tag) => tag !== tagToRemove),
+    }));
+  }
+
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     save.mutate({
       title: draft.title.trim(),
       summary: draft.summary.trim(),
       content: draft.content.trim(),
-      tags: [
-        ...new Set(
-          tagsText
-            .split(',')
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-        ),
-      ],
+      tags: draft.tags,
       status: saveStatus,
     });
   }
@@ -290,22 +312,52 @@ export function AdminNewsPage() {
                   value={draft.summary}
                 />
               </label>
-              <label
-                className="grid gap-1.5 font-bold text-[#223a59]"
-                htmlFor="news-tags"
-              >
-                Tags
-                <input
-                  className="w-full rounded-[10px] border border-[#cfd9e6] bg-[#fbfcfe] px-3 py-3 text-[#10213b] outline-none placeholder:text-[#7890ae] focus:border-[#f0645d] focus:ring-4 focus:ring-[#f0645d]/15"
-                  id="news-tags"
-                  onChange={(event) => setTagsText(event.target.value)}
-                  placeholder="cidade, cultura, trânsito"
-                  value={tagsText}
-                />
+              <div className="grid gap-1.5 font-bold text-[#223a59]">
+                <label htmlFor="news-tags">Tags</label>
+                <div className="flex min-h-[50px] flex-wrap items-center gap-2 rounded-[10px] border border-[#cfd9e6] bg-[#fbfcfe] px-3 py-2 outline-none transition focus-within:border-[#f0645d] focus-within:ring-4 focus-within:ring-[#f0645d]/15">
+                  {draft.tags.map((tag) => (
+                    <span
+                      className="inline-flex items-center gap-1 rounded-full bg-[#eaf0f6] px-2.5 py-1 text-sm font-bold text-[#45617f]"
+                      key={tag}
+                    >
+                      #{tag}
+                      <button
+                        aria-label={`Remover tag ${tag}`}
+                        className="grid size-5 place-items-center rounded-full text-[#617a9d] transition-colors hover:bg-[#dce4ee] hover:text-[#223a59]"
+                        onClick={() => removeTag(tag)}
+                        type="button"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    className="min-w-32 flex-1 border-0 bg-transparent py-1 text-[#10213b] outline-none placeholder:text-[#7890ae]"
+                    id="news-tags"
+                    onChange={(event) => setTagsText(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ',') {
+                        event.preventDefault();
+                        addTags(tagsText);
+                      }
+                      if (
+                        event.key === 'Backspace' &&
+                        !tagsText &&
+                        draft.tags.length
+                      ) {
+                        removeTag(draft.tags[draft.tags.length - 1]);
+                      }
+                    }}
+                    placeholder={
+                      draft.tags.length ? 'Adicionar tag…' : 'Ex.: cultura'
+                    }
+                    value={tagsText}
+                  />
+                </div>
                 <span className="text-xs font-normal text-[#7890ae]">
-                  Separe as tags por vírgulas. Use no máximo 10 tags.
+                  Pressione Enter para adicionar. {draft.tags.length}/10 tags.
                 </span>
-              </label>
+              </div>
               <div>
                 <label
                   className="grid gap-1.5 font-bold text-[#223a59]"
@@ -394,33 +446,37 @@ export function AdminNewsPage() {
               <span className="text-xs font-black tracking-[0.12em] text-[#f0645d]">
                 PRÉVIA DA NOTÍCIA
               </span>
-              <h3 className="mb-2 mt-2 text-2xl font-black tracking-[-0.04em] text-[#10213b]">
+              <h3 className="mb-7 mt-6 max-w-[18ch] text-[clamp(2.7rem,5.5vw,5rem)] font-black leading-[0.96] tracking-[-0.065em] text-[#10213b]">
                 {draft.title.trim() || 'Título da notícia'}
               </h3>
-              <p className="mb-5 text-[#617a9d]">
+              <p className="max-w-[58ch] text-[1.12rem] leading-[1.75] text-[#617a9d]">
                 {draft.summary.trim() || 'O resumo aparecerá aqui.'}
               </p>
-              {tagsText.trim() ? (
+              {draft.tags.length ? (
                 <div className="mb-5 flex flex-wrap gap-2">
-                  {tagsText
-                    .split(',')
-                    .map((tag) => tag.trim())
-                    .filter(Boolean)
-                    .map((tag) => (
-                      <span
-                        className="rounded-full bg-[#eaf0f6] px-3 py-1 text-xs font-bold text-[#45617f]"
-                        key={tag}
-                      >
-                        #{tag}
-                      </span>
-                    ))}
+                  {draft.tags.map((tag) => (
+                    <span
+                      className="rounded-full bg-[#eaf0f6] px-3 py-1 text-xs font-bold text-[#45617f]"
+                      key={tag}
+                    >
+                      #{tag}
+                    </span>
+                  ))}
                 </div>
               ) : null}
-              <div className="rounded-xl border border-[#e1e7ef] bg-[#fbfcfe] p-5">
+              {saveStatus === 'PUBLISHED' ? (
+                <p className="mt-8 text-xs font-black tracking-[0.08em] text-[#f0645d]">
+                  PUBLICADA EM {new Date().toLocaleDateString('pt-BR')}
+                </p>
+              ) : null}
+              <div className="mt-12">
                 {draft.content.trim() ? (
-                  <MarkdownContent content={draft.content} />
+                  <MarkdownContent
+                    className="article-content"
+                    content={draft.content}
+                  />
                 ) : (
-                  <p className="text-[#7890ae]">
+                  <p className="article-content text-[#7890ae]">
                     O conteúdo renderizado em Markdown aparecerá aqui.
                   </p>
                 )}

@@ -26,8 +26,8 @@ export function AdminLoginPage() {
   return (
     <>
       <PageMetadata noIndex title="Área administrativa" />
-      <main className="mx-auto w-[calc(100%-2rem)] max-w-[940px] pb-24 pt-16">
-        <section className="rounded-2xl border border-[#e1e7ef] bg-white p-6 shadow-[0_10px_25px_rgb(16_33_59_/_4%)]">
+      <main className="mx-auto flex min-h-[calc(100vh-170px)] w-[calc(100%-2rem)] max-w-[720px] items-center py-12 pb-32 sm:py-16">
+        <section className="w-full rounded-2xl border border-[#e1e7ef] bg-white p-6 shadow-[0_10px_25px_rgb(16_33_59_/_4%)] sm:p-8">
           <span className="text-xs font-black tracking-[0.18em] text-[#f4b832]">
             GAIVOTA FM
           </span>
