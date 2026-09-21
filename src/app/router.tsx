@@ -8,6 +8,7 @@ import {
 } from '@features/news/public';
 import { HomePage } from '@features/home/public';
 import { AboutPage } from '@features/about/public';
+import { AgendaPage } from '@features/agenda/public';
 
 export const router = createBrowserRouter([
   {
@@ -15,6 +16,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/', element: <HomePage /> },
       { path: '/about', element: <AboutPage /> },
+      { path: '/agenda', element: <AgendaPage /> },
       { path: '/news', element: <NewsListPage /> },
       { path: '/news/:slug', element: <NewsDetailsPage /> },
       { path: '/admin/login', element: <AdminLoginPage /> },

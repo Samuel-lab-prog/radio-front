@@ -67,13 +67,15 @@ function RadioPlayerControls() {
             >
               Quem somos
             </NavLink>
-            <a
-              className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors hover:bg-white/10 hover:text-white sm:min-h-10"
-              href="#agenda"
+            <NavLink
+              className={({ isActive }) =>
+                `inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors sm:min-h-10 ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
+              }
               onClick={() => setMenuOpen(false)}
+              to="/agenda"
             >
               Agenda
-            </a>
+            </NavLink>
           </nav>
           <Link
             className="order-2 ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#f4b832] px-3.5 py-2 text-xs font-black text-[#f4b832] transition-colors hover:bg-[#f4b832] hover:text-[#071120] sm:order-none sm:ml-auto"
