@@ -47,7 +47,7 @@ export const newsApi = {
 	listPublic: () => apiRequest<NewsPage<NewsCard>>({ path: '/news/' }),
 	getPublic: (slug: string) =>
 		apiRequest<Omit<News, 'status'>>({ path: `/news/${slug}` }),
-	listAdmin: (filters?: { status?: NewsStatus; search?: string }) =>
+	listAdmin: (filters?: { status?: NewsStatus | 'ALL'; search?: string }) =>
 		apiRequest<NewsPage<News>>({
 			path: '/admin/news/',
 			query: filters,

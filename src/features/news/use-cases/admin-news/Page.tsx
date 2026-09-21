@@ -96,8 +96,8 @@ export function AdminNewsPage() {
 		],
 		queryFn: () =>
 			newsApi.listAdmin({
+				status: statusFilter,
 				search: debouncedSearch || undefined,
-				...(statusFilter === 'ALL' ? {} : { status: statusFilter }),
 			}),
 		enabled: Boolean(client),
 	});
@@ -756,7 +756,20 @@ export function AdminNewsPage() {
 						{query.isPending || query.isFetching ? (
 							<p className='text-sm text-[#617a9d]'>Atualizando resultados…</p>
 						) : null}
-						{!query.isPending && query.data?.news.length === 0 ? (
+						{query.isError ? (
+							<div className='rounded-xl border border-[#f4b8b4] bg-[#fff4f3] px-4 py-8 text-center'>
+								<p className='font-bold text-[#8e3434]'>
+									Não foi possível carregar as notícias.
+								</p>
+								<p className='mt-1 text-sm text-[#a64b46]'>
+									Verifique a conexão com o servidor e tente novamente.
+								</p>
+							</div>
+						) : null}
+						{!query.isPending &&
+						!query.isFetching &&
+						!query.isError &&
+						query.data?.news.length === 0 ? (
 							<div className='rounded-xl border border-dashed border-[#cfd9e6] px-4 py-8 text-center'>
 								<p className='font-bold text-[#223a59]'>
 									Nenhuma notícia encontrada.
