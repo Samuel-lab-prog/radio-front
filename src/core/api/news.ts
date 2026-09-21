@@ -28,18 +28,18 @@ export type NewsInput = {
 export type CreateNewsInput = NewsInput & { status: NewsStatus };
 
 export const newsApi = {
-	listPublic: () => apiRequest<NewsPage<NewsCard>>({ path: '/news' }),
+	listPublic: () => apiRequest<NewsPage<NewsCard>>({ path: '/news/' }),
 	getPublic: (slug: string) =>
 		apiRequest<Omit<News, 'status'>>({ path: `/news/${slug}` }),
 	listAdmin: (filters?: { status?: NewsStatus; search?: string }) =>
 		apiRequest<NewsPage<News>>({
-			path: '/admin/news',
+			path: '/admin/news/',
 			query: filters,
 		}),
 	getAdmin: (id: string) => apiRequest<News>({ path: `/admin/news/${id}` }),
 	create: (input: CreateNewsInput) =>
 		apiRequest<News, CreateNewsInput>({
-			path: '/admin/news',
+			path: '/admin/news/',
 			method: 'POST',
 			body: input,
 		}),
