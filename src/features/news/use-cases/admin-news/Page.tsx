@@ -22,6 +22,8 @@ const newsFieldLimits = {
 	tag: { min: 1, max: 40 },
 } as const;
 
+type AdminStatusFilter = 'ALL' | News['status'];
+
 function CharacterCounter({
 	max,
 	min,
@@ -55,14 +57,14 @@ export function AdminNewsPage() {
 		'create',
 	);
 	const [search, setSearch] = useState('');
-	const [statusFilter, setStatusFilter] = useState<'' | News['status']>('');
+	const [statusFilter, setStatusFilter] = useState<AdminStatusFilter>('ALL');
 	const [message, setMessage] = useState<string>();
 	const query = useQuery({
 		queryKey: ['news', 'admin', { search, status: statusFilter }],
 		queryFn: () =>
 			newsApi.listAdmin({
 				search: search.trim() || undefined,
-				status: statusFilter || undefined,
+				...(statusFilter === 'ALL' ? {} : { status: statusFilter }),
 			}),
 		enabled: Boolean(client),
 	});
@@ -596,11 +598,11 @@ export function AdminNewsPage() {
 									aria-label='Filtrar por status'
 									className='h-full min-w-40 rounded-[10px] border border-[#cfd9e6] bg-[#fbfcfe] px-3 py-3 text-[#223a59] outline-none focus:border-[#f0645d] focus:ring-4 focus:ring-[#f0645d]/15'
 									onChange={(event) =>
-										setStatusFilter(event.target.value as '' | News['status'])
+										setStatusFilter(event.target.value as AdminStatusFilter)
 									}
 									value={statusFilter}
 								>
-									<option value=''>Todos os status</option>
+									<option value='ALL'>Todos os status</option>
 									<option value='DRAFT'>Rascunhos</option>
 									<option value='PUBLISHED'>Publicadas</option>
 								</select>
