@@ -48,7 +48,7 @@ export function NewsDetailsPage() {
         >
           ← NOTÍCIAS
         </Link>
-        <h1 className="mb-7 mt-6 max-w-[18ch] text-[clamp(2.7rem,5.5vw,5rem)] font-black leading-[0.96] tracking-[-0.065em] text-[#10213b]">
+        <h1 className="mb-7 mt-6 max-w-[22ch] text-[clamp(2.35rem,4.5vw,4rem)] font-black leading-[0.98] tracking-[-0.06em] text-[#10213b]">
           {news.title}
         </h1>
         <p className="max-w-[58ch] text-[1.12rem] leading-[1.75] text-[#617a9d]">
@@ -69,7 +69,10 @@ export function NewsDetailsPage() {
         {news.publishedAt ? (
           <p className="mt-8 text-xs font-black tracking-[0.08em] text-[#f0645d]">
             PUBLICADA EM{' '}
-            {new Date(news.publishedAt).toLocaleDateString('pt-BR')}
+            {new Intl.DateTimeFormat('pt-BR', {
+              dateStyle: 'short',
+              timeStyle: 'short',
+            }).format(new Date(news.publishedAt))}
           </p>
         ) : null}
         <MarkdownContent className="article-content" content={news.content} />

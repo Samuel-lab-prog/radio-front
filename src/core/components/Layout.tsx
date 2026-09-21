@@ -1,5 +1,6 @@
-import { LogIn, Volume2 } from 'lucide-react';
+import { LogIn, Menu, Volume2, X } from 'lucide-react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
+import { useState } from 'react';
 import { RadioPlayerProvider } from './RadioPlayerContext';
 import { useRadioPlayer } from '../hooks/radio-player';
 
@@ -12,6 +13,7 @@ export function Layout() {
 }
 
 function RadioPlayerControls() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const {
     hasError,
     isLoading,
@@ -34,12 +36,14 @@ function RadioPlayerControls() {
           </Link>
           <nav
             aria-label="Navegação principal"
-            className="order-3 flex w-full items-center gap-1 overflow-x-auto rounded-xl border border-white/10 bg-white/5 p-1 text-xs text-[#bfd0e6] sm:order-none sm:w-auto sm:gap-1 sm:text-sm"
+            className={`order-3 w-full flex-col gap-1 overflow-hidden rounded-xl border border-white/10 bg-white/5 p-1 text-xs text-[#bfd0e6] transition-[max-height,opacity,transform] duration-200 ease-out sm:order-none sm:flex sm:max-h-none sm:w-auto sm:flex-row sm:items-center sm:overflow-visible sm:text-sm sm:opacity-100 sm:transform-none sm:pointer-events-auto ${menuOpen ? 'pointer-events-auto flex max-h-80 translate-y-0 opacity-100' : 'pointer-events-none flex max-h-0 -translate-y-2 opacity-0'}`}
+            id="main-navigation"
           >
             <NavLink
               className={({ isActive }) =>
-                `inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
+                `inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors sm:min-h-10 ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
               }
+              onClick={() => setMenuOpen(false)}
               end
               to="/"
             >
@@ -47,29 +51,26 @@ function RadioPlayerControls() {
             </NavLink>
             <NavLink
               className={({ isActive }) =>
-                `inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
+                `inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors sm:min-h-10 ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
               }
+              onClick={() => setMenuOpen(false)}
               to="/news"
             >
               Notícias
             </NavLink>
             <NavLink
               className={({ isActive }) =>
-                `inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
+                `inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors sm:min-h-10 ${isActive ? 'bg-white text-[#10213b] shadow-sm' : 'hover:bg-white/10 hover:text-white'}`
               }
+              onClick={() => setMenuOpen(false)}
               to="/about"
             >
               Quem somos
             </NavLink>
             <a
-              className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors hover:bg-white/10 hover:text-white"
-              href="#live"
-            >
-              Ao vivo
-            </a>
-            <a
-              className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors hover:bg-white/10 hover:text-white"
+              className="inline-flex min-h-11 shrink-0 items-center rounded-lg px-3 py-2 font-bold transition-colors hover:bg-white/10 hover:text-white sm:min-h-10"
               href="#agenda"
+              onClick={() => setMenuOpen(false)}
             >
               Agenda
             </a>
@@ -81,13 +82,16 @@ function RadioPlayerControls() {
             <LogIn size={15} />
             Login
           </Link>
-          <a
-            className="order-2 inline-flex min-h-11 items-center gap-2 rounded-lg px-2.5 text-xs font-black tracking-[0.08em] text-[#f4b832] transition-colors hover:bg-white/10 sm:order-none"
-            href="#live"
+          <button
+            aria-controls="main-navigation"
+            aria-expanded={menuOpen}
+            aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+            className={`order-2 grid size-11 place-items-center rounded-lg border border-white/15 text-[#f6f8fc] transition-[background-color,transform] duration-200 hover:bg-white/10 sm:hidden ${menuOpen ? 'rotate-90' : 'rotate-0'}`}
+            onClick={() => setMenuOpen((open) => !open)}
+            type="button"
           >
-            <span className="inline-block size-2 rounded-full bg-[#f0645d] shadow-[0_0_0_5px_rgb(240_100_93_/_16%)]" />{' '}
-            AO VIVO
-          </a>
+            {menuOpen ? <X size={21} /> : <Menu size={21} />}
+          </button>
         </div>
       </header>
       <Outlet />

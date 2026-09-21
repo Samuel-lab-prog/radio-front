@@ -10,6 +10,38 @@ import { MarkdownContent } from '../../internal/components/MarkdownContent';
 
 const emptyInput: NewsInput = { title: '', summary: '', content: '', tags: [] };
 
+const statusLabels: Record<News['status'], string> = {
+  DRAFT: 'RASCUNHO',
+  PUBLISHED: 'PUBLICADA',
+};
+
+const newsFieldLimits = {
+  title: { min: 3, max: 180 },
+  summary: { min: 10, max: 500 },
+  content: { min: 20, max: 100_000 },
+  tag: { min: 1, max: 40 },
+} as const;
+
+function CharacterCounter({
+  max,
+  min,
+  value,
+}: {
+  max: number;
+  min: number;
+  value: string;
+}) {
+  const belowMinimum = value.length > 0 && value.length < min;
+  return (
+    <span
+      className={`text-xs font-normal ${belowMinimum ? 'text-[#d94f4a]' : 'text-[#7890ae]'}`}
+      aria-live="polite"
+    >
+      {value.length}/{max} caracteres · mínimo {min}
+    </span>
+  );
+}
+
 export function AdminNewsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -288,11 +320,18 @@ export function AdminNewsPage() {
                 <input
                   className="w-full rounded-[10px] border border-[#cfd9e6] bg-[#fbfcfe] px-3 py-3 text-[#10213b] outline-none focus:border-[#f0645d] focus:ring-4 focus:ring-[#f0645d]/15"
                   id="news-title"
+                  maxLength={newsFieldLimits.title.max}
+                  minLength={newsFieldLimits.title.min}
                   name="title"
                   onChange={(event) =>
                     setDraft({ ...draft, title: event.target.value })
                   }
                   required
+                  value={draft.title}
+                />
+                <CharacterCounter
+                  max={newsFieldLimits.title.max}
+                  min={newsFieldLimits.title.min}
                   value={draft.title}
                 />
               </label>
@@ -304,11 +343,18 @@ export function AdminNewsPage() {
                 <textarea
                   className="min-h-32 w-full resize-y rounded-[10px] border border-[#cfd9e6] bg-[#fbfcfe] px-3 py-3 text-[#10213b] outline-none focus:border-[#f0645d] focus:ring-4 focus:ring-[#f0645d]/15"
                   id="news-summary"
+                  maxLength={newsFieldLimits.summary.max}
+                  minLength={newsFieldLimits.summary.min}
                   name="summary"
                   onChange={(event) =>
                     setDraft({ ...draft, summary: event.target.value })
                   }
                   required
+                  value={draft.summary}
+                />
+                <CharacterCounter
+                  max={newsFieldLimits.summary.max}
+                  min={newsFieldLimits.summary.min}
                   value={draft.summary}
                 />
               </label>
@@ -334,6 +380,7 @@ export function AdminNewsPage() {
                   <input
                     className="min-w-32 flex-1 border-0 bg-transparent py-1 text-[#10213b] outline-none placeholder:text-[#7890ae]"
                     id="news-tags"
+                    maxLength={newsFieldLimits.tag.max}
                     onChange={(event) => setTagsText(event.target.value)}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ',') {
@@ -354,9 +401,16 @@ export function AdminNewsPage() {
                     value={tagsText}
                   />
                 </div>
-                <span className="text-xs font-normal text-[#7890ae]">
-                  Pressione Enter para adicionar. {draft.tags.length}/10 tags.
-                </span>
+                <div className="flex flex-wrap justify-between gap-x-3 gap-y-1">
+                  <span className="text-xs font-normal text-[#7890ae]">
+                    Pressione Enter para adicionar. Cada tag deve ter entre 1 e{' '}
+                    {newsFieldLimits.tag.max} caracteres.
+                  </span>
+                  <span className="text-xs font-normal text-[#7890ae]">
+                    {tagsText.length}/{newsFieldLimits.tag.max} ·{' '}
+                    {draft.tags.length}/10 tags
+                  </span>
+                </div>
               </div>
               <div>
                 <label
@@ -368,12 +422,19 @@ export function AdminNewsPage() {
                 <textarea
                   className="min-h-32 w-full resize-y rounded-[10px] border border-[#cfd9e6] bg-[#fbfcfe] px-3 py-3 text-[#10213b] outline-none placeholder:text-[#7890ae] focus:border-[#f0645d] focus:ring-4 focus:ring-[#f0645d]/15"
                   id="news-content"
+                  maxLength={newsFieldLimits.content.max}
+                  minLength={newsFieldLimits.content.min}
                   name="content"
                   onChange={(event) =>
                     setDraft({ ...draft, content: event.target.value })
                   }
                   placeholder="Escreva usando Markdown..."
                   required
+                  value={draft.content}
+                />
+                <CharacterCounter
+                  max={newsFieldLimits.content.max}
+                  min={newsFieldLimits.content.min}
                   value={draft.content}
                 />
               </div>
@@ -418,7 +479,7 @@ export function AdminNewsPage() {
                   </label>
                 </div>
               </fieldset>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap justify-end gap-2">
                 <button
                   className="inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f0645d] px-[1.15rem] py-3.5 font-extrabold text-white active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={save.isPending}
@@ -446,7 +507,7 @@ export function AdminNewsPage() {
               <span className="text-xs font-black tracking-[0.12em] text-[#f0645d]">
                 PRÉVIA DA NOTÍCIA
               </span>
-              <h3 className="mb-7 mt-6 max-w-[18ch] text-[clamp(2.7rem,5.5vw,5rem)] font-black leading-[0.96] tracking-[-0.065em] text-[#10213b]">
+              <h3 className="mb-7 mt-6 max-w-[22ch] text-[clamp(2.35rem,4.5vw,4rem)] font-black leading-[0.98] tracking-[-0.06em] text-[#10213b]">
                 {draft.title.trim() || 'Título da notícia'}
               </h3>
               <p className="max-w-[58ch] text-[1.12rem] leading-[1.75] text-[#617a9d]">
@@ -466,10 +527,14 @@ export function AdminNewsPage() {
               ) : null}
               {saveStatus === 'PUBLISHED' ? (
                 <p className="mt-8 text-xs font-black tracking-[0.08em] text-[#f0645d]">
-                  PUBLICADA EM {new Date().toLocaleDateString('pt-BR')}
+                  PUBLICADA EM{' '}
+                  {new Intl.DateTimeFormat('pt-BR', {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                  }).format(new Date())}
                 </p>
               ) : null}
-              <div className="mt-12">
+              <div>
                 {draft.content.trim() ? (
                   <MarkdownContent
                     className="article-content"
@@ -499,7 +564,8 @@ export function AdminNewsPage() {
                 </h2>
               </div>
               <span className="rounded-full bg-[#f5f7fa] px-3 py-1 text-xs font-bold text-[#617a9d]">
-                {query.data?.news.length ?? 0} itens
+                {query.data?.news.length ?? 0}{' '}
+                {(query.data?.news.length ?? 0) === 1 ? 'item' : 'itens'}
               </span>
             </div>
             <div className="mb-5 grid gap-2 sm:grid-cols-[1fr_auto]">
@@ -554,7 +620,7 @@ export function AdminNewsPage() {
               >
                 <div>
                   <span className="text-xs font-black tracking-[0.08em] text-[#f0645d]">
-                    {news.status}
+                    {statusLabels[news.status]}
                   </span>
                   <strong className="block text-[#10213b]">{news.title}</strong>
                   <p className="my-1 text-[#617a9d]">{news.summary}</p>
