@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Pencil, Search, Trash2 } from 'lucide-react';
+import { Pencil, Search, Trash2, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
 	getNewsCoverUrl,
@@ -70,6 +70,7 @@ export function AdminNewsPage() {
 	);
 	const [search, setSearch] = useState('');
 	const [statusFilter, setStatusFilter] = useState<AdminStatusFilter>('ALL');
+	const [debouncedSearch, setDebouncedSearch] = useState('');
 	const [message, setMessage] = useState<string>();
 	const [coverPreview, setCoverPreview] = useState<string>();
 	const [coverUploadState, setCoverUploadState] = useState<
@@ -81,11 +82,21 @@ export function AdminNewsPage() {
 			if (coverPreview?.startsWith('blob:')) URL.revokeObjectURL(coverPreview);
 		};
 	}, [coverPreview]);
+	useEffect(() => {
+		const timer = window.setTimeout(() => {
+			setDebouncedSearch(search.trim());
+		}, 300);
+		return () => window.clearTimeout(timer);
+	}, [search]);
 	const query = useQuery({
-		queryKey: ['news', 'admin', { search, status: statusFilter }],
+		queryKey: [
+			'news',
+			'admin',
+			{ search: debouncedSearch, status: statusFilter },
+		],
 		queryFn: () =>
 			newsApi.listAdmin({
-				search: search.trim() || undefined,
+				search: debouncedSearch || undefined,
 				...(statusFilter === 'ALL' ? {} : { status: statusFilter }),
 			}),
 		enabled: Boolean(client),
@@ -709,11 +720,22 @@ export function AdminNewsPage() {
 								/>
 								<input
 									aria-label='Pesquisar notícias'
-									className='w-full rounded-[10px] border border-[#cfd9e6] bg-[#fbfcfe] py-3 pl-10 pr-3 text-[#10213b] outline-none focus:border-[#f0645d] focus:ring-4 focus:ring-[#f0645d]/15'
+									className='w-full rounded-[10px] border border-[#cfd9e6] bg-[#fbfcfe] py-3 pl-10 pr-10 text-[#10213b] outline-none focus:border-[#f0645d] focus:ring-4 focus:ring-[#f0645d]/15'
+									maxLength={120}
 									onChange={(event) => setSearch(event.target.value)}
 									placeholder='Pesquisar por título ou resumo'
 									value={search}
 								/>
+								{search ? (
+									<button
+										aria-label='Limpar pesquisa'
+										className='absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-[#7890ae] transition hover:bg-[#eaf0f6] hover:text-[#223a59]'
+										onClick={() => setSearch('')}
+										type='button'
+									>
+										<X size={16} />
+									</button>
+								) : null}
 							</label>
 							<label className='relative block'>
 								<span className='sr-only'>Filtrar por status</span>
@@ -731,8 +753,8 @@ export function AdminNewsPage() {
 								</select>
 							</label>
 						</div>
-						{query.isPending ? (
-							<p className='text-[#617a9d]'>Carregando…</p>
+						{query.isPending || query.isFetching ? (
+							<p className='text-sm text-[#617a9d]'>Atualizando resultados…</p>
 						) : null}
 						{!query.isPending && query.data?.news.length === 0 ? (
 							<div className='rounded-xl border border-dashed border-[#cfd9e6] px-4 py-8 text-center'>
@@ -749,7 +771,7 @@ export function AdminNewsPage() {
 								className='mt-3 flex flex-col items-start justify-between gap-4 border-t border-[#edf1f5] pt-3 sm:flex-row sm:items-center'
 								key={news.id}
 							>
-								<div>
+								<div className='min-w-0 flex-1'>
 									<span className='text-xs font-black tracking-[0.08em] text-[#f0645d]'>
 										{statusLabels[news.status]}
 									</span>
@@ -768,12 +790,12 @@ export function AdminNewsPage() {
 										</div>
 									) : null}
 								</div>
-								<div className='flex flex-wrap gap-2'>
+								<div className='flex w-full shrink-0 flex-wrap gap-2 sm:w-auto sm:flex-nowrap'>
 									{panelMode === 'edit' ? (
 										<>
 											<button
 												aria-label={`Editar ${news.title}`}
-												className='inline-flex items-center justify-center gap-1.5 rounded-full border border-[#b9c8da] bg-white px-4 py-2.5 font-bold text-[#223a59]'
+												className='inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-[#b9c8da] bg-white px-4 py-2.5 font-bold text-[#223a59]'
 												onClick={() => editNews(news)}
 												type='button'
 											>
@@ -781,7 +803,7 @@ export function AdminNewsPage() {
 												Editar
 											</button>
 											<button
-												className='inline-flex items-center justify-center rounded-full border border-[#b9c8da] bg-white px-4 py-2.5 font-bold text-[#223a59]'
+												className='inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-[#b9c8da] bg-white px-4 py-2.5 font-bold text-[#223a59]'
 												onClick={() =>
 													action.mutate({
 														id: news.id,
@@ -798,7 +820,7 @@ export function AdminNewsPage() {
 									{panelMode === 'delete' ? (
 										<button
 											aria-label={`Excluir ${news.title}`}
-											className='inline-flex items-center justify-center gap-1.5 rounded-full border border-[#f0645d] bg-white px-4 py-2.5 font-bold text-[#d94f4a]'
+											className='inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full border border-[#f0645d] bg-white px-4 py-2.5 font-bold text-[#d94f4a]'
 											onClick={() => removeNews(news)}
 											type='button'
 										>
