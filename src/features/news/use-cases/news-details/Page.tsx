@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { newsApi } from '@core/api/news';
+import { MarkdownContent } from '../../internal/components/MarkdownContent';
 
 export function NewsDetailsPage() {
   const slug = useParams().slug ?? '';
@@ -37,7 +38,7 @@ export function NewsDetailsPage() {
           PUBLICADA EM {new Date(news.publishedAt).toLocaleDateString('pt-BR')}
         </p>
       ) : null}
-      <div className="article-content">{news.content}</div>
+      <MarkdownContent className="article-content" content={news.content} />
     </main>
   );
 }
