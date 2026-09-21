@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Newspaper } from 'lucide-react';
-import type { NewsCard } from '@core/api/news';
+import { getNewsCoverUrl, type NewsCard } from '@core/api/news';
 
 export function NewsCards({ news }: { news: NewsCard[] }) {
 	if (!news.length)
@@ -14,11 +14,19 @@ export function NewsCards({ news }: { news: NewsCard[] }) {
 					to={`/news/${item.slug}`}
 				>
 					<div className='grid min-h-[170px] place-items-center bg-gradient-to-br from-[#173b5d] to-[#f0b637] text-[#fff8e7]'>
-						<Newspaper
-							aria-hidden='true'
-							size={38}
-							strokeWidth={1.6}
-						/>
+						{getNewsCoverUrl(item.coverImageKey) ? (
+							<img
+								alt={item.coverImageAlt || ''}
+								className='h-full min-h-[170px] w-full object-cover'
+								src={getNewsCoverUrl(item.coverImageKey)}
+							/>
+						) : (
+							<Newspaper
+								aria-hidden='true'
+								size={38}
+								strokeWidth={1.6}
+							/>
+						)}
 					</div>
 					<div className='px-5 pb-5 pt-4'>
 						<time

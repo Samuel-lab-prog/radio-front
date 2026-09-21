@@ -1,14 +1,26 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Pencil, Search, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { newsApi, type News, type NewsInput } from '@core/api/news';
+import {
+	getNewsCoverUrl,
+	newsApi,
+	type News,
+	type NewsInput,
+} from '@core/api/news';
 import { authApi } from '@core/api/auth';
 import { PageMetadata } from '@core/components/PageMetadata';
 import { useAuthStore } from '@core/session/auth-store';
 import { MarkdownContent } from '../../internal/components/MarkdownContent';
 
-const emptyInput: NewsInput = { title: '', summary: '', content: '', tags: [] };
+const emptyInput: NewsInput = {
+	title: '',
+	summary: '',
+	content: '',
+	tags: [],
+	coverImageKey: null,
+	coverImageAlt: null,
+};
 
 const statusLabels: Record<News['status'], string> = {
 	DRAFT: 'RASCUNHO',
@@ -59,6 +71,16 @@ export function AdminNewsPage() {
 	const [search, setSearch] = useState('');
 	const [statusFilter, setStatusFilter] = useState<AdminStatusFilter>('ALL');
 	const [message, setMessage] = useState<string>();
+	const [coverPreview, setCoverPreview] = useState<string>();
+	const [coverUploadState, setCoverUploadState] = useState<
+		'idle' | 'uploading' | 'uploaded' | 'error'
+	>('idle');
+	const [coverUploadMessage, setCoverUploadMessage] = useState<string>();
+	useEffect(() => {
+		return () => {
+			if (coverPreview?.startsWith('blob:')) URL.revokeObjectURL(coverPreview);
+		};
+	}, [coverPreview]);
 	const query = useQuery({
 		queryKey: ['news', 'admin', { search, status: statusFilter }],
 		queryFn: () =>
@@ -76,6 +98,8 @@ export function AdminNewsPage() {
 				summary: input.summary,
 				content: input.content,
 				tags: input.tags,
+				coverImageKey: input.coverImageKey,
+				coverImageAlt: input.coverImageAlt,
 			});
 			if (updated.status === input.status) return updated;
 			return input.status === 'PUBLISHED'
@@ -153,6 +177,9 @@ export function AdminNewsPage() {
 		setDraft({ ...emptyInput });
 		setTagsText('');
 		setSaveStatus('DRAFT');
+		setCoverPreview(undefined);
+		setCoverUploadState('idle');
+		setCoverUploadMessage(undefined);
 	}
 
 	function startCreate() {
@@ -169,7 +196,11 @@ export function AdminNewsPage() {
 			summary: news.summary,
 			content: news.content,
 			tags,
+			coverImageKey: news.coverImageKey,
+			coverImageAlt: news.coverImageAlt,
 		});
+		setCoverPreview(getNewsCoverUrl(news.coverImageKey));
+		setCoverUploadState(news.coverImageKey ? 'uploaded' : 'idle');
 		setTagsText('');
 		setSaveStatus(news.status);
 		setMessage(undefined);
@@ -224,8 +255,44 @@ export function AdminNewsPage() {
 			summary: draft.summary.trim(),
 			content: draft.content.trim(),
 			tags: draft.tags,
+			coverImageKey: draft.coverImageKey,
+			coverImageAlt: draft.coverImageAlt,
 			status: saveStatus,
 		});
+	}
+
+	async function uploadCover(file: File) {
+		if (file.size > 5 * 1024 * 1024) {
+			setCoverUploadState('error');
+			setCoverUploadMessage('A imagem deve ter no máximo 5 MB.');
+			return;
+		}
+		if (
+			!['image/avif', 'image/jpeg', 'image/png', 'image/webp'].includes(
+				file.type,
+			)
+		) {
+			setCoverUploadState('error');
+			setCoverUploadMessage('Use uma imagem AVIF, JPG, PNG ou WebP.');
+			return;
+		}
+		if (coverPreview?.startsWith('blob:')) URL.revokeObjectURL(coverPreview);
+		setCoverPreview(URL.createObjectURL(file));
+		setCoverUploadState('uploading');
+		setCoverUploadMessage('Enviando imagem…');
+		try {
+			const upload = await newsApi.uploadCover(file);
+			setDraft((current) => ({ ...current, coverImageKey: upload.key }));
+			setCoverUploadState('uploaded');
+			setCoverUploadMessage('Imagem pronta para a publicação.');
+		} catch (error) {
+			setCoverUploadState('error');
+			setCoverUploadMessage(
+				error instanceof Error
+					? error.message
+					: 'Não foi possível enviar a capa.',
+			);
+		}
 	}
 
 	function removeNews(news: News) {
@@ -420,6 +487,62 @@ export function AdminNewsPage() {
 									</span>
 								</div>
 							</div>
+							<div className='grid gap-3 rounded-xl border border-[#dce4ee] bg-[#fbfcfe] p-4'>
+								<div className='flex flex-wrap items-center justify-between gap-2'>
+									<label
+										className='font-bold text-[#223a59]'
+										htmlFor='news-cover'
+									>
+										Imagem de capa
+									</label>
+									<span className='text-xs font-normal text-[#7890ae]'>
+										JPG, PNG, WebP ou AVIF · até 5 MB
+									</span>
+								</div>
+								{coverPreview ? (
+									<img
+										alt={draft.coverImageAlt || 'Prévia da capa da notícia'}
+										className='aspect-[16/7] w-full rounded-lg object-cover'
+										src={coverPreview}
+									/>
+								) : null}
+								<input
+									accept='image/avif,image/jpeg,image/png,image/webp'
+									className='block w-full rounded-lg border border-[#cfd9e6] bg-white px-3 py-2 text-sm text-[#223a59] file:mr-3 file:rounded-md file:border-0 file:bg-[#eaf0f6] file:px-3 file:py-2 file:font-bold file:text-[#223a59]'
+									id='news-cover'
+									onChange={(event) => {
+										const file = event.target.files?.[0];
+										if (file) void uploadCover(file);
+									}}
+									type='file'
+								/>
+								<label
+									className='grid gap-1.5 text-sm font-bold text-[#223a59]'
+									htmlFor='news-cover-alt'
+								>
+									Texto alternativo
+									<input
+										className='w-full rounded-lg border border-[#cfd9e6] bg-white px-3 py-2 font-normal text-[#10213b] outline-none focus:border-[#f0645d] focus:ring-4 focus:ring-[#f0645d]/15'
+										id='news-cover-alt'
+										maxLength={180}
+										onChange={(event) =>
+											setDraft({
+												...draft,
+												coverImageAlt: event.target.value || null,
+											})
+										}
+										placeholder='Descreva a imagem para acessibilidade'
+										value={draft.coverImageAlt ?? ''}
+									/>
+								</label>
+								{coverUploadMessage ? (
+									<span
+										className={`text-xs font-normal ${coverUploadState === 'error' ? 'text-[#d94f4a]' : 'text-[#617a9d]'}`}
+									>
+										{coverUploadMessage}
+									</span>
+								) : null}
+							</div>
 							<div>
 								<label
 									className='grid gap-1.5 font-bold text-[#223a59]'
@@ -490,7 +613,7 @@ export function AdminNewsPage() {
 							<div className='flex flex-wrap justify-end gap-2'>
 								<button
 									className='inline-flex min-h-11 items-center justify-center rounded-[10px] bg-[#f0645d] px-[1.15rem] py-3.5 font-extrabold text-white active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-60'
-									disabled={save.isPending}
+									disabled={save.isPending || coverUploadState === 'uploading'}
 									type='submit'
 								>
 									{saveStatus === 'PUBLISHED'

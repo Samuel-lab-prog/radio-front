@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
-import { newsApi } from '@core/api/news';
+import { getNewsCoverUrl, newsApi } from '@core/api/news';
 import { PageMetadata } from '@core/components/PageMetadata';
 import { MarkdownContent } from '../../internal/components/MarkdownContent';
 
@@ -57,6 +57,13 @@ export function NewsDetailsPage() {
 				<p className='max-w-[58ch] text-[1.12rem] leading-[1.75] text-[#617a9d]'>
 					{news.summary}
 				</p>
+				{getNewsCoverUrl(news.coverImageKey) ? (
+					<img
+						alt={news.coverImageAlt || news.title}
+						className='my-10 aspect-[16/7] w-full rounded-2xl object-cover shadow-[0_18px_40px_rgb(16_33_59_/_10%)]'
+						src={getNewsCoverUrl(news.coverImageKey)}
+					/>
+				) : null}
 				{(news.tags ?? []).length ? (
 					<div className='my-7 flex flex-wrap gap-2'>
 						{(news.tags ?? []).map((tag) => (

@@ -8,6 +8,8 @@ export type News = {
 	summary: string;
 	content: string;
 	tags: string[];
+	coverImageKey: string | null;
+	coverImageAlt: string | null;
 	status: NewsStatus;
 	publishedAt: string | null;
 	createdAt: string;
@@ -24,8 +26,22 @@ export type NewsInput = {
 	summary: string;
 	content: string;
 	tags: string[];
+	coverImageKey: string | null;
+	coverImageAlt: string | null;
 };
 export type CreateNewsInput = NewsInput & { status: NewsStatus };
+export type NewsCoverUpload = {
+	key: string;
+	uploadUrl: string;
+	fileUrl: string;
+	fields: Record<string, string>;
+};
+
+export function getNewsCoverUrl(key: string | null | undefined) {
+	if (!key) return undefined;
+	const baseUrl = import.meta.env.VITE_MEDIA_BASE_URL;
+	return baseUrl ? `${baseUrl.replace(/\/$/, '')}/${key}` : undefined;
+}
 
 export const newsApi = {
 	listPublic: () => apiRequest<NewsPage<NewsCard>>({ path: '/news/' }),
@@ -55,4 +71,29 @@ export const newsApi = {
 		apiRequest<News>({ path: `/admin/news/${id}/unpublish`, method: 'POST' }),
 	remove: (id: string) =>
 		apiRequest<News>({ path: `/admin/news/${id}`, method: 'DELETE' }),
+	uploadCover: async (file: File) => {
+		const upload = await apiRequest<
+			NewsCoverUpload,
+			{
+				fileName: string;
+				contentType: string;
+				contentLength: number;
+			}
+		>({
+			path: '/admin/files/upload-url',
+			method: 'POST',
+			body: {
+				fileName: file.name,
+				contentType: file.type,
+				contentLength: file.size,
+			},
+		});
+		const response = await fetch(upload.uploadUrl, {
+			method: 'PUT',
+			headers: { 'Content-Type': file.type },
+			body: file,
+		});
+		if (!response.ok) throw new Error('Não foi possível enviar a capa.');
+		return upload;
+	},
 };
