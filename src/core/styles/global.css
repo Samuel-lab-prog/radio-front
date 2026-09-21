@@ -1,0 +1,250 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #f5f2ff;
+  background: #110d22;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at 10% 0%, #30205d 0, transparent 32rem), #110d22;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+.shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: auto;
+}
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.4rem 0;
+}
+.brand {
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+.brand span {
+  color: #ffba5d;
+}
+.navlinks {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  color: #cfc7eb;
+}
+.hero {
+  padding: 5.5rem 0 4rem;
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 2rem;
+  align-items: center;
+}
+.eyebrow {
+  color: #ffba5d;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  font-size: 0.78rem;
+}
+h1 {
+  font-size: clamp(2.6rem, 7vw, 5.8rem);
+  line-height: 0.94;
+  margin: 0.7rem 0 1.2rem;
+  letter-spacing: -0.06em;
+}
+h2 {
+  margin: 0 0 1rem;
+  font-size: 1.65rem;
+}
+.hero p,
+.muted {
+  color: #cfc7eb;
+  line-height: 1.6;
+  max-width: 58ch;
+}
+.player {
+  background: linear-gradient(145deg, #ffba5d, #fd6688);
+  color: #25152f;
+  border-radius: 1.6rem;
+  padding: 2rem;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 2rem 5rem #0006;
+}
+.player strong {
+  font-size: 1.7rem;
+}
+.player button,
+.primary {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.75rem 1.1rem;
+  background: #231847;
+  color: #fff;
+  font-weight: 800;
+  width: max-content;
+}
+.section {
+  padding: 2.5rem 0;
+}
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.card {
+  background: #1c1633;
+  border: 1px solid #393052;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+.card:hover {
+  transform: translateY(-3px);
+  border-color: #ffba5d;
+}
+.card h3 {
+  margin: 0.5rem 0;
+  font-size: 1.15rem;
+}
+.card p {
+  color: #cfc7eb;
+  line-height: 1.45;
+}
+.tag {
+  color: #ffba5d;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.page {
+  padding: 3rem 0 5rem;
+}
+.article {
+  max-width: 760px;
+}
+.article h1 {
+  font-size: clamp(2.3rem, 5vw, 4.2rem);
+}
+.article-content {
+  white-space: pre-wrap;
+  line-height: 1.8;
+  color: #eeeaff;
+}
+.admin {
+  max-width: 940px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+.panel {
+  background: #1c1633;
+  border: 1px solid #393052;
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+.form {
+  display: grid;
+  gap: 0.8rem;
+}
+label {
+  display: grid;
+  gap: 0.4rem;
+  color: #dcd5f5;
+  font-weight: 700;
+}
+input,
+textarea {
+  width: 100%;
+  background: #110d22;
+  color: #fff;
+  border: 1px solid #51446e;
+  border-radius: 0.65rem;
+  padding: 0.75rem;
+}
+textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.secondary {
+  background: transparent;
+  border: 1px solid #665783;
+  color: #eeeaff;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+}
+.danger {
+  border-color: #ff6f8d;
+  color: #ff9eaf;
+}
+.notice {
+  padding: 0.8rem 1rem;
+  border-radius: 0.7rem;
+  background: #31274f;
+  color: #eeeaff;
+}
+.error {
+  background: #5b2033;
+  color: #ffd6df;
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1rem;
+}
+.news-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.8rem;
+}
+.news-row p {
+  margin: 0.2rem 0;
+  color: #cfc7eb;
+}
+@media (max-width: 720px) {
+  .hero,
+  .split {
+    grid-template-columns: 1fr;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .navlinks {
+    gap: 0.65rem;
+    font-size: 0.9rem;
+  }
+  h1 {
+    letter-spacing: -0.04em;
+  }
+}

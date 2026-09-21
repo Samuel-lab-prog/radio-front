@@ -1,0 +1,6 @@
+node_modules/
+dist/
+reports/architecture/
+.env
+.env.*
+!.env.example
