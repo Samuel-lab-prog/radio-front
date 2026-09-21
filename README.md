@@ -38,4 +38,4 @@ bun run metrics
 ```
 
 The architecture checker validates source namespaces, feature public contracts,
-dependency direction, fetch placement, role names, and empty directories.
+dependency direction, fetch placement, role names, and empty directories
