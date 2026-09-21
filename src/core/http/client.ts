@@ -23,7 +23,7 @@ export async function apiRequest<TResponse, TBody = undefined>({
   const baseUrl = import.meta.env.VITE_API_URL;
   if (!baseUrl) throw new Error('VITE_API_URL não está configurada');
 
-  const url = new URL(`${baseUrl}${path}`);
+  const url = new URL(`${baseUrl}${path}`, window.location.origin);
   Object.entries(query ?? {}).forEach(([key, value]) => {
     if (value !== undefined) url.searchParams.set(key, String(value));
   });

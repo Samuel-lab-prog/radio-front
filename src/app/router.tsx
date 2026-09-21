@@ -7,12 +7,14 @@ import {
   NewsListPage,
 } from '@features/news/public';
 import { HomePage } from '@features/home/public';
+import { AboutPage } from '@features/about/public';
 
 export const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
       { path: '/', element: <HomePage /> },
+      { path: '/about', element: <AboutPage /> },
       { path: '/news', element: <NewsListPage /> },
       { path: '/news/:slug', element: <NewsDetailsPage /> },
       { path: '/admin/login', element: <AdminLoginPage /> },

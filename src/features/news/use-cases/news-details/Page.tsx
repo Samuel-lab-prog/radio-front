@@ -12,14 +12,16 @@ export function NewsDetailsPage() {
   });
   if (query.isPending)
     return (
-      <main className="shell page">
-        <p className="muted">Carregando…</p>
+      <main className="mx-auto w-[calc(100%-2rem)] max-w-[1120px] pb-24 pt-16">
+        <p className="text-[#617a9d]">Carregando…</p>
       </main>
     );
   if (query.isError || !query.data)
     return (
-      <main className="shell page">
-        <p className="notice error">Notícia não encontrada.</p>
+      <main className="mx-auto w-[calc(100%-2rem)] max-w-[1120px] pb-24 pt-16">
+        <p className="rounded-xl bg-[#fdeaea] px-4 py-3 text-[#8e3434]">
+          Notícia não encontrada.
+        </p>
         <p>
           <Link to="/news">Voltar para notícias</Link>
         </p>
@@ -27,18 +29,43 @@ export function NewsDetailsPage() {
     );
   const news = query.data;
   return (
-    <main className="shell page article">
-      <Link className="tag" to="/news">
+    <main className="mx-auto w-[calc(100%-2rem)] max-w-[980px] pb-32 pt-20 sm:pt-24">
+      <Link
+        className="text-xs font-black tracking-[0.08em] text-[#f0645d]"
+        to="/news"
+      >
         ← NOTÍCIAS
       </Link>
-      <h1>{news.title}</h1>
-      <p className="muted">{news.summary}</p>
+      <h1 className="mb-7 mt-6 max-w-[18ch] text-[clamp(2.7rem,5.5vw,5rem)] font-black leading-[0.96] tracking-[-0.065em] text-[#10213b]">
+        {news.title}
+      </h1>
+      <p className="max-w-[58ch] text-[1.12rem] leading-[1.75] text-[#617a9d]">
+        {news.summary}
+      </p>
+      {(news.tags ?? []).length ? (
+        <div className="my-7 flex flex-wrap gap-2">
+          {(news.tags ?? []).map((tag) => (
+            <span
+              className="rounded-full bg-[#eaf0f6] px-3 py-1 text-xs font-bold text-[#45617f]"
+              key={tag}
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      ) : null}
       {news.publishedAt ? (
-        <p className="tag">
+        <p className="mt-8 text-xs font-black tracking-[0.08em] text-[#f0645d]">
           PUBLICADA EM {new Date(news.publishedAt).toLocaleDateString('pt-BR')}
         </p>
       ) : null}
       <MarkdownContent className="article-content" content={news.content} />
+      <Link
+        className="mt-12 inline-flex items-center gap-2 rounded-[10px] border border-[#cbd8e6] px-4 py-3 text-sm font-extrabold text-[#10213b] transition-colors hover:border-[#f0645d] hover:text-[#f0645d]"
+        to="/news"
+      >
+        <span aria-hidden="true">←</span> Voltar para notícias
+      </Link>
     </main>
   );
 }

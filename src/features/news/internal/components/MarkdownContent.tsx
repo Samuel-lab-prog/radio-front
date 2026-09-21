@@ -9,10 +9,10 @@ type MarkdownContentProps = {
 
 export function MarkdownContent({
   content,
-  className = 'markdown-content',
+  className = '',
 }: MarkdownContentProps) {
   return (
-    <div className={className}>
+    <div className={`markdown-content ${className}`.trim()}>
       <ReactMarkdown
         rehypePlugins={[rehypeSanitize]}
         remarkPlugins={[remarkGfm]}
